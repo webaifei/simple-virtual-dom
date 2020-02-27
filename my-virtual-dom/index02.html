@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <ul class="box">
+        <li class="one">one</li>
+        <li>two</li>
+        <li>three</li>
+    </ul>
+</body>
+<script>
+    /**
+     * DOM -> javascript 对象的映射
+     **/
+    function Element(tagName, props, children) {
+        if (!(this instanceof Element)) {
+            return new Element(tagName, props, children)
+        }
+        this.tagName = tagName;
+        this.props = props;
+        this.children = children;
+
+    }
+    Element.prototype.render = function () {
+        // 通过dom api 创建当前节点
+        var props = this.props;
+        var children = this.children;
+        var el = document.createElement(this.tagName);
+        // 设置props
+        if (props) {
+            Object.keys(props).forEach(key => {
+                let value = props[key];
+                el.setAttribute(key, value);
+            })
+        }
+        // 递归的创建children节点
+        if (Array.isArray(children)) {
+            children.forEach(child => {
+                let childEl = child instanceof Element ?
+                    child.render() :
+                    document.createTextNode(child);
+
+                el.appendChild(childEl);
+            })
+        }
+        return el;
+    }
+
+    var el = Element;
+    var root = el('ul', {
+        'class': 'box'
+    }, [
+        el('li', {
+            'class': 'one'
+        }, ["one"]),
+        el('li', null, ["two"]),
+        el('li', null, ["three"])
+    ]).render();
+    
+    /**
+     * diff 算法
+     * 1. 对比两个树
+     * 2. 返回更新操作列表
+     * 前提：
+     * dom操作跨节点
+     * */
+    function diff(newTree, oldTree) {
+
+    }
+    
+
+    document.body.appendChild(root);
+</script>
+
+</html>
